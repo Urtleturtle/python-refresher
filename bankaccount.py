@@ -4,7 +4,6 @@ class BankAccount:
     def __init__(self,name, accountNumber):
         if(not isinstance(name,str)):
             raise Exception("Please enter a valid name")
-            return
         
         self.name = name
 
@@ -12,7 +11,6 @@ class BankAccount:
 
         if(not isinstance(accountNumber,int)):
             raise Exception("Please enter a valid account number")
-            return
         
         self.accountNumber = accountNumber
 
