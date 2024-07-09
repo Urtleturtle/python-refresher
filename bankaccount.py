@@ -1,18 +1,14 @@
 import numpy
 
 class BankAccount:
-    def __init__(self,name, initialBalance, accountNumber):
+    def __init__(self,name, accountNumber):
         if(not isinstance(name,str)):
             print("Please enter a valid name")
             return
         
         self.name = name
 
-        if(not isinstance(initialBalance,float)):
-            print("Please enter a valid balance")
-            return
-        
-        self.balance = initialBalance
+        self.balance = 0
 
         if(not isinstance(accountNumber,int)):
             print("Please enter a valid account number")
@@ -21,14 +17,15 @@ class BankAccount:
         self.accountNumber = accountNumber
 
     def withdraw(self,amount):
+        #can withdraw negative amount of money for infinite money hax
         try:
-            self.balance -= amount
+            self.balance = self.balance - amount
         except:
             print("Please enter a valid number")
 
     def deposit(self,amount):
         try:
-            self.balance += amount
+            self.balance = self.balance + amount
         except:
             print("Please enter a valid number")
 
