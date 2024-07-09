@@ -17,18 +17,23 @@ class BankAccount:
         self.accountNumber = accountNumber
 
     def withdraw(self,amount):
-        #can withdraw negative amount of money for infinite money hax
-        try:
-            self.balance = self.balance - amount
-        except:
+        if amount > 0:
+            try:
+                self.balance = self.balance - amount
+            except:
+                print("Please enter a valid number")
+        else:
             print("Please enter a valid number")
 
+
     def deposit(self,amount):
-        try:
-            self.balance = self.balance + amount
-        except:
+        if amount > 0:
+            try:
+                self.balance = self.balance + amount
+            except:
+                print("Please enter a valid number")
+        else:
             print("Please enter a valid number")
 
     def printBal(self):
         print(self.balance)
-        return self.balance
