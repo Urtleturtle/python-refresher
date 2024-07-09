@@ -2,22 +2,22 @@ import numpy
 
 class BankAccount:
     def __init__(self,name, initialBalance, accountNumber):
-        if(not isinstance(name,str)){
+        if(not isinstance(name,str)):
             print("Please enter a valid name")
-            break;
-        }
+            return
+        
         self.name = name
 
-        if(isinstance(initialBalance,float)){
+        if(not isinstance(initialBalance,float)):
             print("Please enter a valid balance")
-            break;
-        }
+            return
+        
         self.balance = initialBalance
 
-        if(isinstance(accountNumber,int)){
+        if(not isinstance(accountNumber,int)):
             print("Please enter a valid account number")
-            break;
-        }
+            return
+        
         self.accountNumber = accountNumber
 
     def withdraw(self,amount):
