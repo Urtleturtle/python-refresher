@@ -55,27 +55,62 @@ def calculate_auv_angular_acceleration(F_magnitude, F_angle, inertia = 1, thrust
 def calculate_auv2_acceleration(T, alpha, theta, mass = 100):
     """calculates acceleration of the AUV
     Takes T as a matrix of thruster magnitudes, alpha as the angle of the thrusters, theta as the angle of the AUV, and mass as the mass of the AUV"""
-    T_dir = np.ndarray([alpha, 2*np.pi - alpha, np.pi + alpha, 180 - alpha])
+    T_dir = np.array([alpha+theta, theta-alpha, np.pi + alpha + theta, np.pi - alpha + theta])
     hor_components = np.zeros(4)
     ver_components = np.zeros(4)
-
     for i in range(4):
         hor_components[i] = T[i] * np.cos(T_dir[i])
         ver_components[i] = T[i] * np.sin(T_dir[i])
 
-    return np.sqrt((np.sum(hor_components)**2) + (np.sum(ver_components)**2))/mass
+    return np.array([np.sum(hor_components),np.sum(ver_components)])/mass
 
 def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia):
     """calculates angular acceleration of the AUV
     Takes T as a matrix of thruster magnitudes, alpha as the angle of the thrusters, L and l as the longitudinal and lateral distance of the thrusters to the middle, and inertia for moment of inertia"""
-    T_dir = np.ndarray([alpha, 2*np.pi - alpha, np.pi + alpha, 180 - alpha])
-    arm_vectors = np.ndarray([[l, -L,0],[l,L,0],[-l,L,0],[-l,-L,0]])
+    T_dir = np.array([alpha,- alpha, np.pi + alpha, np.pi - alpha])
+    arm_vectors = np.array([[l, -L,0],
+                              [l,L,0],
+                              [-l,L,0],
+                              [-l,-L,0]])
     total_torque = 0
     for i in range(4):
-        torque = np.cross(arm_vectors[i], [T[i] * np.cos(T_dir[i]), T[i] * np.sin(T_dir[i]),0])
+        torque = np.cross(arm_vectors[i], np.array([T[i] * np.cos(T_dir[i]), T[i] * np.sin(T_dir[i]),0]))[2]
         total_torque = total_torque + torque
     return total_torque/inertia
 
-def simulate_auv2_motion(T, alpha, L, l, mass, inertia, dt, t_final, x0, y0, theta0):
+def simulate_auv2_motion(T, alpha, L, l, mass = 100, inertia = 100, dt = 1, t_final = 10, x0 = 0, y0 = 0, theta0 = 0):
     """simulates the AUVs motion
     Takes T as the matrix of thruster magnitudes, alpha as the angle of the thrusters, L and l as the longitudinal and lateral distance of the thrusters to the middle, mass for the mass of AUV, inertia for moment of inertia, dt as the time step of the simulation in seconds, t_final as the final time of the simulation, x0 and y0 as the initial position, and theta0 as the initial angle of the AUV"""
+    AUV_theta = theta0
+    accel = calculate_auv2_acceleration(T,alpha,AUV_theta, mass)
+    ang_accel = calculate_auv2_angular_acceleration(T,alpha,L,l,inertia)
+
+    vel = np.zeros(2)
+    pos = np.array([x0,y0])
+    ang_vel = 0
+    num = int(t_final/dt)
+    
+    time_array = np.zeros(num)
+    x = np.zeros(num)
+    y = np.zeros(num)
+    theta = np.zeros(num)
+    v = np.zeros(num)
+    omega = np.zeros(num)
+    a = np.zeros(num)
+
+    time = 0
+    for i in range(num):
+        time_array[i] = time
+        x[i] = pos[0]
+        y[i] = pos[1]
+        theta[i] = AUV_theta
+        v[i] = np.sqrt(vel[0]**2 + vel[1]**2)
+        omega[i] = ang_vel
+        a[i] = np.sqrt(accel[0]**2 + accel[1]**2)
+        vel = np.add(vel, accel * dt)
+        pos = np.add(pos, vel * dt)
+        ang_vel = ang_vel + ang_accel * dt
+        theta = theta + ang_vel
+        time += dt
+    return np.array([time_array,x,y,theta,v,omega,a])
+print(simulate_auv2_motion(np.array([10,10,0,0]), 2,3,3,5,5))
